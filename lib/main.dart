@@ -63,14 +63,14 @@ class _QuestionPageState extends State<QuestionPage> {
       backgroundColor: colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 35.0,
+          horizontal: 20.0,
         ),
         child: Center(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
-                flex: 1,
+                flex: 0,
                 child: Column(
                   children: [
                     Progress(
@@ -118,12 +118,45 @@ class Answers extends StatelessWidget {
 
       print('$answerNum. $answerText');
 
-      allAnswers.add(Row(
-        children: [
-          Flexible(
-            child: Text('$answerNum. $answerText'),
+      allAnswers.add(Container(
+        margin: EdgeInsets.symmetric(
+          vertical: 10.0,
+        ),
+        padding: EdgeInsets.symmetric(
+          vertical: 5.0,
+        ),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.white,
           ),
-        ],
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              flex: 6,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  left: 10.0,
+                ),
+                child: Text(
+                  '$answerNum. $answerText',
+                  style: TextStyle(
+                    fontSize: 12.0,
+                  ),
+                ),
+              ),
+            ),
+            Flexible(
+                child: IconButton(
+              icon: Icon(Icons.circle_outlined),
+              onPressed: () {
+                print(answerNum);
+              },
+            ))
+          ],
+        ),
       ));
     }
     return allAnswers;
