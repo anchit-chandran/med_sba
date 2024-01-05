@@ -99,13 +99,30 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 }
 
-class Answers extends StatelessWidget {
+class Answers extends StatefulWidget {
   final Map<String, String> answers;
 
   const Answers({
     super.key,
     required this.answers,
   });
+
+  @override
+  State<Answers> createState() => _AnswersState();
+}
+
+class _AnswersState extends State<Answers> {
+
+  @override
+  Widget build(BuildContext context) {
+    final allAnswerRows = constructAnswerRows(answers: widget.answers);
+
+
+    return Column(
+      // mainAxisAlignment: MainAxisAlignment.end,
+      children: allAnswerRows,
+    );
+  }
 
   List<Widget> constructAnswerRows({required Map<String, String> answers}) {
     List<Widget> allAnswers = [];
@@ -115,8 +132,6 @@ class Answers extends StatelessWidget {
 
       // Then get the answer text
       String answerText = answer.value;
-
-      print('$answerNum. $answerText');
 
       allAnswers.add(Container(
         margin: EdgeInsets.symmetric(
@@ -160,16 +175,6 @@ class Answers extends StatelessWidget {
       ));
     }
     return allAnswers;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final allAnswerRows = constructAnswerRows(answers: answers);
-
-    return Column(
-      // mainAxisAlignment: MainAxisAlignment.end,
-      children: allAnswerRows,
-    );
   }
 }
 
