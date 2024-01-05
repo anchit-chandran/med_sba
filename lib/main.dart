@@ -69,15 +69,27 @@ class _QuestionPageState extends State<QuestionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Progress(
-                questionNumber: questionNumber,
-                questionTotal: questionTotal,
+              Expanded(
+                flex: 1,
+                child: Column(
+                  children: [
+                    Progress(
+                      questionNumber: questionNumber,
+                      questionTotal: questionTotal,
+                    ),
+                    QuestionStem(
+                      stem: stem,
+                    ),
+                  ],
+                ),
               ),
-              QuestionStem(
-                stem: stem,
-              ),
-              Answers(
-                answers: answers,
+              Expanded(
+                flex: 1,
+                child: Container(
+                  child: Answers(
+                    answers: answers,
+                  ),
+                ),
               ),
             ],
           ),
@@ -121,14 +133,9 @@ class Answers extends StatelessWidget {
   Widget build(BuildContext context) {
     final allAnswerRows = constructAnswerRows(answers: answers);
 
-    return Container(
-      margin: EdgeInsets.only(
-        top: 20.0,
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: allAnswerRows,
-      ),
+    return Column(
+      // mainAxisAlignment: MainAxisAlignment.end,
+      children: allAnswerRows,
     );
   }
 }
