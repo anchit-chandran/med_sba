@@ -50,6 +50,14 @@ class _QuestionPageState extends State<QuestionPage> {
     const stem =
         "A 65-year-old male patient presents to the emergency department with central chest pain radiating to his left arm, which started 2 hours ago. He is sweating profusely and looks pale. His past medical history includes hypertension and type 2 diabetes mellitus. An ECG shows ST-segment elevation in leads II, III, and aVF. His blood pressure is 135/85 mmHg, and his pulse is 90 beats per minute.\n\nWhich of the following is the most appropriate next step in management?";
 
+    const answers = {
+      'answer1': 'Immediate administration of a sublingual nitrate',
+      'answer2': 'Urgent coronary angiography',
+      'answer3': 'Intravenous administration of a fibrinolytic agent',
+      'answer4': 'High-dose oral aspirin and a beta-blocker',
+      'answer5': 'Observation and repeat ECG in one hour',
+    };
+
     return Scaffold(
       appBar: AppBar(),
       backgroundColor: colorScheme.background,
@@ -67,10 +75,59 @@ class _QuestionPageState extends State<QuestionPage> {
               ),
               QuestionStem(
                 stem: stem,
-              )
+              ),
+              Answers(
+                answers: answers,
+              ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class Answers extends StatelessWidget {
+  final Map<String, String> answers;
+
+  const Answers({
+    super.key,
+    required this.answers,
+  });
+
+  List<Widget> constructAnswerRows({required Map<String, String> answers}) {
+    List<Widget> allAnswers = [];
+    for (var answer in answers.entries) {
+      // First get the answer number from key
+      int answerNum = int.parse(answer.key[answer.key.length - 1]);
+
+      // Then get the answer text
+      String answerText = answer.value;
+
+      print('$answerNum. $answerText');
+
+      allAnswers.add(Row(
+        children: [
+          Flexible(
+            child: Text('$answerNum. $answerText'),
+          ),
+        ],
+      ));
+    }
+    return allAnswers;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final allAnswerRows = constructAnswerRows(answers: answers);
+
+    return Container(
+      margin: EdgeInsets.only(
+        top: 20.0,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: allAnswerRows,
       ),
     );
   }
