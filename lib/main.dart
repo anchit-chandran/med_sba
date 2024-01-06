@@ -1,10 +1,14 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:med_sba/change_selected_answer.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => ChangeSelectedAnswer(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -111,11 +115,9 @@ class Answers extends StatefulWidget {
 }
 
 class _AnswersState extends State<Answers> {
-
   @override
   Widget build(BuildContext context) {
     final allAnswerRows = constructAnswerRows(answers: widget.answers);
-
 
     return Column(
       // mainAxisAlignment: MainAxisAlignment.end,
@@ -125,51 +127,87 @@ class _AnswersState extends State<Answers> {
 
   List<Widget> constructAnswerRows({required Map<String, String> answers}) {
     List<Widget> allAnswers = [];
+
+    var selectedAnswer =
+        Provider.of<ChangeSelectedAnswer>(context).selectedAnswer;
+
     for (var answer in answers.entries) {
       // First get the answer number from key
       int answerNum = int.parse(answer.key[answer.key.length - 1]);
 
+      // Set true if this is the current selected answer.
+      bool isSelected = answerNum == selectedAnswer;
+
+      // Now, set the conditional stylings.
+      Icon answerIcon;
+      Border answerBorder;
+
+      if (isSelected) {
+        answerIcon = Icon(
+          Icons.circle_rounded,
+          color: Colors.white,
+        );
+
+        answerBorder = Border.all(
+          color: Colors.white,
+          width: 2.0,
+        );
+      } else {
+        answerIcon = Icon(
+          Icons.circle_outlined,
+          color: Colors.white,
+        );
+        answerBorder = Border.all(
+          color: Colors.black,
+          width: 2.0,
+        );
+      }
+
       // Then get the answer text
       String answerText = answer.value;
 
-      allAnswers.add(Container(
-        margin: EdgeInsets.symmetric(
-          vertical: 10.0,
-        ),
-        padding: EdgeInsets.symmetric(
-          vertical: 5.0,
-        ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.white,
+      allAnswers.add(GestureDetector(
+        onTap: () {
+          Provider.of<ChangeSelectedAnswer>(context, listen: false)
+              .changeAnswer(answerNum);
+        },
+        child: Container(
+          margin: EdgeInsets.symmetric(
+            vertical: 10.0,
           ),
-          borderRadius: BorderRadius.circular(20.0),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Flexible(
-              flex: 6,
-              child: Padding(
-                padding: const EdgeInsets.only(
-                  left: 10.0,
-                ),
-                child: Text(
-                  '$answerNum. $answerText',
-                  style: TextStyle(
-                    fontSize: 12.0,
+          padding: EdgeInsets.symmetric(
+            vertical: 5.0,
+          ),
+          decoration: BoxDecoration(
+            border: answerBorder,
+            borderRadius: BorderRadius.circular(20.0),
+            color: Colors.black,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                flex: 6,
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    left: 10.0,
+                  ),
+                  child: Text(
+                    '$answerNum. $answerText',
+                    style: TextStyle(
+                      fontSize: 12.0,
+                    ),
                   ),
                 ),
               ),
-            ),
-            Flexible(
-                child: IconButton(
-              icon: Icon(Icons.circle_outlined),
-              onPressed: () {
-                print(answerNum);
-              },
-            ))
-          ],
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: answerIcon,
+                ),
+              )
+            ],
+          ),
         ),
       ));
     }
