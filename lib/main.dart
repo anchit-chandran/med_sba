@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:med_sba/change_selected_answer.dart';
+import 'package:med_sba/question_notifier.dart';
 
 void main() {
   runApp(ChangeNotifierProvider(
-    create: (context) => ChangeSelectedAnswer(),
+    create: (context) => QuestionNotifier(),
     child: MyApp(),
   ));
 }
@@ -44,23 +44,24 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
+  void changeQuestion(context, int newQuestion) {
+    Provider.of<QuestionNotifier>(context, listen: false)
+        .changeQuestion(newQuestion);
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    const questionNumber = 1;
-    const questionTotal = 10;
-    const stem =
-        "A 65-year-old male patient presents to the emergency department with central chest pain radiating to his left arm, which started 2 hours ago. He is sweating profusely and looks pale. His past medical history includes hypertension and type 2 diabetes mellitus. An ECG shows ST-segment elevation in leads II, III, and aVF. His blood pressure is 135/85 mmHg, and his pulse is 90 beats per minute.\n\nWhich of the following is the most appropriate next step in management?";
+    final questionTotal = Provider.of<QuestionNotifier>(context, listen: false)
+        .getTotalQuestions();
 
-    const answers = {
-      'answer1': 'Immediate administration of a sublingual nitrate',
-      'answer2': 'Urgent coronary angiography',
-      'answer3': 'Intravenous administration of a fibrinolytic agent',
-      'answer4': 'High-dose oral aspirin and a beta-blocker',
-      'answer5': 'Observation and repeat ECG in one hour',
-    };
-    const correctAnswer = 1;
+    final currentQuestionData =
+        Provider.of<QuestionNotifier>(context).currentQuestionData;
+    final questionNumber = currentQuestionData['questionNumber'];
+    final stem = currentQuestionData['stem'];
+    final answers = currentQuestionData['answers'];
+    final correctAnswer = currentQuestionData['correctAnswer'];
 
     return Scaffold(
       appBar: AppBar(),
@@ -70,33 +71,34 @@ class _QuestionPageState extends State<QuestionPage> {
           horizontal: 20.0,
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              flex: 0,
-              child: Column(
+              child: ListView(
                 children: [
-                  Progress(
-                    questionNumber: questionNumber,
-                    questionTotal: questionTotal,
+                  Column(
+                    children: [
+                      Progress(
+                        questionNumber: questionNumber,
+                        questionTotal: questionTotal,
+                      ),
+                      QuestionStem(
+                        stem: stem,
+                      ),
+                    ],
                   ),
-                  QuestionStem(
-                    stem: stem,
+                  Answers(
+                    answers: answers,
+                    correctAnswer: correctAnswer,
                   ),
                 ],
               ),
             ),
-            Expanded(
-              flex: 0,
-              child: Container(
-                child: Answers(
-                  answers: answers,
-                  correctAnswer: correctAnswer,
-                ),
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 30.0,
               ),
-            ),
-            Expanded(
               child: ActionButtonsRow(correctAnswer: correctAnswer),
             ),
           ],
@@ -122,15 +124,13 @@ class _ActionButtonsRowState extends State<ActionButtonsRow> {
   void handleSubmitQuestionPress(context) {
     // First get the currently selected answer.
     var selectedAnswer =
-        Provider.of<ChangeSelectedAnswer>(context, listen: false)
-            .selectedAnswer;
+        Provider.of<QuestionNotifier>(context, listen: false).selectedAnswer;
 
     // Then notify the provider that the user has submitted an answer.
-    Provider.of<ChangeSelectedAnswer>(context, listen: false)
-        .setSubmittedAnswer();
+    Provider.of<QuestionNotifier>(context, listen: false).setSubmittedAnswer();
 
     if (selectedAnswer == widget.correctAnswer) {
-      Provider.of<ChangeSelectedAnswer>(context, listen: false).setIsCorrect();
+      Provider.of<QuestionNotifier>(context, listen: false).setIsCorrect();
     } else {
       print('wrong');
     }
@@ -138,16 +138,22 @@ class _ActionButtonsRowState extends State<ActionButtonsRow> {
 
   @override
   Widget build(BuildContext context) {
-    var hasSubmittedAnswer =
-        Provider.of<ChangeSelectedAnswer>(context).hasSubmittedAnswer;
+    var provider = Provider.of<QuestionNotifier>(context);
+    var hasSubmittedAnswer = provider.hasSubmittedAnswer;
+    int currentQuestionNum = provider.currentQuestionNum;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton.outlined(
-          onPressed: () {
-            print('pressed prev q');
-          },
+          onPressed: (currentQuestionNum == 1)
+              ? null
+              : () {
+                  Provider.of<QuestionNotifier>(
+                    context,
+                    listen: false,
+                  ).changeQuestion(currentQuestionNum - 1);
+                },
           icon: Icon(Icons.arrow_left),
         ),
         IconButton.outlined(
@@ -157,9 +163,14 @@ class _ActionButtonsRowState extends State<ActionButtonsRow> {
           icon: Icon(Icons.check),
         ),
         IconButton.outlined(
-          onPressed: () {
-            print('pressed next q');
-          },
+          onPressed: (currentQuestionNum == provider.getTotalQuestions())
+              ? null
+              : () {
+                  Provider.of<QuestionNotifier>(
+                    context,
+                    listen: false,
+                  ).changeQuestion(currentQuestionNum + 1);
+                },
           icon: Icon(Icons.arrow_right),
         ),
       ],
@@ -249,11 +260,11 @@ class _AnswersState extends State<Answers> {
   List<Widget> constructAnswerRows({required Map<String, String> answers}) {
     List<Widget> allAnswers = [];
 
-    var selectedAnswer = Provider.of<ChangeSelectedAnswer>(
+    var selectedAnswer = Provider.of<QuestionNotifier>(
       context,
     ).selectedAnswer;
 
-    bool hasSubmittedAnswer = Provider.of<ChangeSelectedAnswer>(
+    bool hasSubmittedAnswer = Provider.of<QuestionNotifier>(
       context,
       listen: false,
     ).hasSubmittedAnswer;
@@ -299,7 +310,7 @@ class _AnswersState extends State<Answers> {
         onTap: () {
           hasSubmittedAnswer
               ? null
-              : Provider.of<ChangeSelectedAnswer>(
+              : Provider.of<QuestionNotifier>(
                   context,
                   listen: false,
                 ).changeAnswer(answerNum);
