@@ -60,6 +60,7 @@ class _QuestionPageState extends State<QuestionPage> {
       'answer4': 'High-dose oral aspirin and a beta-blocker',
       'answer5': 'Observation and repeat ECG in one hour',
     };
+    const correctAnswer = 1;
 
     return Scaffold(
       appBar: AppBar(),
@@ -91,11 +92,12 @@ class _QuestionPageState extends State<QuestionPage> {
               child: Container(
                 child: Answers(
                   answers: answers,
+                  correctAnswer: correctAnswer,
                 ),
               ),
             ),
             Expanded(
-              child: ActionButtonsRow(),
+              child: ActionButtonsRow(correctAnswer: correctAnswer),
             ),
           ],
         ),
@@ -104,13 +106,42 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 }
 
-class ActionButtonsRow extends StatelessWidget {
+class ActionButtonsRow extends StatefulWidget {
+  final int correctAnswer;
+
   const ActionButtonsRow({
     super.key,
+    required this.correctAnswer,
   });
 
   @override
+  State<ActionButtonsRow> createState() => _ActionButtonsRowState();
+}
+
+class _ActionButtonsRowState extends State<ActionButtonsRow> {
+  void handleSubmitQuestionPress(context) {
+    // First get the currently selected answer.
+    var selectedAnswer =
+        Provider.of<ChangeSelectedAnswer>(context, listen: false)
+            .selectedAnswer;
+
+    // Then notify the provider that the user has submitted an answer.
+    Provider.of<ChangeSelectedAnswer>(context, listen: false)
+        .setSubmittedAnswer();
+
+    if (selectedAnswer == widget.correctAnswer) {
+      Provider.of<ChangeSelectedAnswer>(context, listen: false).setIsCorrect();
+    } else {
+      print('wrong');
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    var hasSubmittedAnswer =
+        Provider.of<ChangeSelectedAnswer>(context, listen: false)
+            .hasSubmittedAnswer;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -121,9 +152,9 @@ class ActionButtonsRow extends StatelessWidget {
           icon: Icon(Icons.arrow_left),
         ),
         IconButton.outlined(
-          onPressed: () {
-            print('submit');
-          },
+          onPressed: hasSubmittedAnswer
+              ? null
+              : () => handleSubmitQuestionPress(context),
           icon: Icon(Icons.check),
         ),
         IconButton.outlined(
@@ -139,10 +170,12 @@ class ActionButtonsRow extends StatelessWidget {
 
 class Answers extends StatefulWidget {
   final Map<String, String> answers;
+  final int correctAnswer;
 
   const Answers({
     super.key,
     required this.answers,
+    required this.correctAnswer,
   });
 
   @override
@@ -160,11 +193,52 @@ class _AnswersState extends State<Answers> {
     );
   }
 
+  Color getAnswerColor({
+    required bool isSelected,
+    required bool hasSubmittedAnswer,
+    required bool isCorrect,
+    bool isIconColor = false,
+  }) {
+    if (isIconColor) {
+      if (hasSubmittedAnswer) {
+        if (isCorrect) {
+          return Colors.green;
+        } else {
+          return Colors.red;
+        }
+      } else {
+        return Colors.white;
+      }
+    } else {
+      if (isSelected) {
+        if (hasSubmittedAnswer) {
+          if (isCorrect) {
+            return Colors.green;
+          } else {
+            return Colors.red;
+          }
+        } else {
+          return Colors.white;
+        }
+      } else {
+        return Colors.black;
+      }
+    }
+  }
+
   List<Widget> constructAnswerRows({required Map<String, String> answers}) {
     List<Widget> allAnswers = [];
 
-    var selectedAnswer =
-        Provider.of<ChangeSelectedAnswer>(context).selectedAnswer;
+    var selectedAnswer = Provider.of<ChangeSelectedAnswer>(
+      context,
+    ).selectedAnswer;
+
+    bool hasSubmittedAnswer = Provider.of<ChangeSelectedAnswer>(
+      context,
+      listen: false,
+    ).hasSubmittedAnswer;
+
+    
 
     for (var answer in answers.entries) {
       // First get the answer number from key
@@ -173,30 +247,30 @@ class _AnswersState extends State<Answers> {
       // Set true if this is the current selected answer.
       bool isSelected = answerNum == selectedAnswer;
 
+      bool isCorrect = answerNum == widget.correctAnswer;
+
       // Now, set the conditional stylings.
       Icon answerIcon;
       Border answerBorder;
 
-      if (isSelected) {
-        answerIcon = Icon(
-          Icons.circle_rounded,
-          color: Colors.white,
-        );
+      // Set default styling
+      answerIcon = Icon(
+        isSelected || (hasSubmittedAnswer && isCorrect) ? Icons.circle_rounded : Icons.circle_outlined,
+        color: getAnswerColor(
+          isSelected: isSelected,
+          hasSubmittedAnswer: hasSubmittedAnswer,
+          isCorrect: isCorrect,
+          isIconColor: true,
+        ),
+      );
 
-        answerBorder = Border.all(
-          color: Colors.white,
-          width: 2.0,
-        );
-      } else {
-        answerIcon = Icon(
-          Icons.circle_outlined,
-          color: Colors.white,
-        );
-        answerBorder = Border.all(
-          color: Colors.black26,
-          width: 2.0,
-        );
-      }
+      answerBorder = Border.all(
+        color: getAnswerColor(
+            isSelected: isSelected,
+            hasSubmittedAnswer: hasSubmittedAnswer,
+            isCorrect: isCorrect),
+        width: 2.0,
+      );
 
       // Then get the answer text
       String answerText = answer.value;
