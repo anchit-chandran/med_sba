@@ -139,8 +139,7 @@ class _ActionButtonsRowState extends State<ActionButtonsRow> {
   @override
   Widget build(BuildContext context) {
     var hasSubmittedAnswer =
-        Provider.of<ChangeSelectedAnswer>(context, listen: false)
-            .hasSubmittedAnswer;
+        Provider.of<ChangeSelectedAnswer>(context).hasSubmittedAnswer;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -198,13 +197,34 @@ class _AnswersState extends State<Answers> {
     required bool hasSubmittedAnswer,
     required bool isCorrect,
     bool isIconColor = false,
+    bool isTextColor = false,
   }) {
+    if (isTextColor) {
+      if (hasSubmittedAnswer) {
+        if (isCorrect) {
+          return Colors.green;
+        } else {
+          if (isSelected) {
+            return Colors.red;
+          } else {
+            return Color.fromARGB(139, 255, 60, 79);
+          }
+        }
+      } else {
+        return Colors.white;
+      }
+    }
+
     if (isIconColor) {
       if (hasSubmittedAnswer) {
         if (isCorrect) {
           return Colors.green;
         } else {
-          return Colors.red;
+          if (isSelected) {
+            return Colors.red;
+          } else {
+            return Color.fromARGB(139, 255, 60, 79);
+          }
         }
       } else {
         return Colors.white;
@@ -238,8 +258,6 @@ class _AnswersState extends State<Answers> {
       listen: false,
     ).hasSubmittedAnswer;
 
-    
-
     for (var answer in answers.entries) {
       // First get the answer number from key
       int answerNum = int.parse(answer.key[answer.key.length - 1]);
@@ -255,7 +273,9 @@ class _AnswersState extends State<Answers> {
 
       // Set default styling
       answerIcon = Icon(
-        isSelected || (hasSubmittedAnswer && isCorrect) ? Icons.circle_rounded : Icons.circle_outlined,
+        isSelected || (hasSubmittedAnswer && isCorrect)
+            ? Icons.circle_rounded
+            : Icons.circle_outlined,
         color: getAnswerColor(
           isSelected: isSelected,
           hasSubmittedAnswer: hasSubmittedAnswer,
@@ -277,8 +297,12 @@ class _AnswersState extends State<Answers> {
 
       allAnswers.add(GestureDetector(
         onTap: () {
-          Provider.of<ChangeSelectedAnswer>(context, listen: false)
-              .changeAnswer(answerNum);
+          hasSubmittedAnswer
+              ? null
+              : Provider.of<ChangeSelectedAnswer>(
+                  context,
+                  listen: false,
+                ).changeAnswer(answerNum);
         },
         child: Container(
           margin: EdgeInsets.symmetric(
@@ -305,6 +329,12 @@ class _AnswersState extends State<Answers> {
                     '$answerNum. $answerText',
                     style: TextStyle(
                       fontSize: 12.0,
+                      color: getAnswerColor(
+                        isSelected: isSelected,
+                        hasSubmittedAnswer: hasSubmittedAnswer,
+                        isCorrect: isCorrect,
+                        isTextColor: true,
+                      ),
                     ),
                   ),
                 ),
