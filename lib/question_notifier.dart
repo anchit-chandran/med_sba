@@ -17,7 +17,7 @@ const questionData = {
   2: {
     "questionNumber": 2,
     "stem":
-        "A 58-year-old woman presents with a 3-month history of progressive dyspnea and dry cough. She has never smoked and has no significant past medical history. Physical examination reveals fine crackles at the lung bases. A high-resolution CT scan shows bilateral pulmonary fibrosis. Which of the following is the most likely diagnosis?",
+        "A 58-year-old woman presents with a 3-month history of progressive dyspnea and dry cough. She has never smoked and has no significant past medical history. Physical examination reveals fine crackles at the lung bases. A high-resolution CT scan shows bilateral pulmonary fibrosis.\n\nWhich of the following is the most likely diagnosis?",
     "answers": {
       'answer1': 'Chronic obstructive pulmonary disease (COPD)',
       'answer2': 'Asthma',
@@ -30,7 +30,7 @@ const questionData = {
   3: {
     "questionNumber": 3,
     "stem":
-        "A 45-year-old man with a history of intravenous drug use presents with fever, weight loss, and a new heart murmur. Blood cultures grow Staphylococcus aureus. An echocardiogram shows vegetations on the tricuspid valve. What is the most likely diagnosis?",
+        "A 45-year-old man with a history of intravenous drug use presents with fever, weight loss, and a new heart murmur. Blood cultures grow Staphylococcus aureus. An echocardiogram shows vegetations on the tricuspid valve.\n\nWhat is the most likely diagnosis?",
     "answers": {
       'answer1': 'Acute pericarditis',
       'answer2': 'Infective endocarditis',
@@ -43,7 +43,7 @@ const questionData = {
   4: {
     "questionNumber": 4,
     "stem":
-        "A 50-year-old male with a history of smoking and chronic alcoholism presents with epigastric pain radiating to the back, nausea, and vomiting. Laboratory tests reveal elevated serum amylase and lipase levels. What is the most appropriate initial management?",
+        "A 50-year-old male with a history of smoking and chronic alcoholism presents with epigastric pain radiating to the back, nausea, and vomiting. Laboratory tests reveal elevated serum amylase and lipase levels.\n\nWhat is the most appropriate initial management?",
     "answers": {
       'answer1': 'Endoscopic retrograde cholangiopancreatography (ERCP)',
       'answer2': 'Intravenous fluid resuscitation',
@@ -56,7 +56,7 @@ const questionData = {
   5: {
     "questionNumber": 5,
     "stem":
-        "A 30-year-old woman presents with a two-day history of painful, burning urination and increased urinary frequency. She has no significant past medical history and takes no medications. A urine dipstick test is positive for nitrites. What is the most appropriate treatment?",
+        "A 30-year-old woman presents with a two-day history of painful, burning urination and increased urinary frequency. She has no significant past medical history and takes no medications. A urine dipstick test is positive for nitrites.\n\nWhat is the most appropriate treatment?",
     "answers": {
       'answer1': 'Oral ciprofloxacin',
       'answer2': 'Intravenous fluids',
@@ -69,7 +69,7 @@ const questionData = {
   6: {
     "questionNumber": 6,
     "stem":
-        "A 70-year-old man with a history of hypertension and hyperlipidemia presents with sudden onset of severe headache, nausea, and vomiting. Examination reveals a stiff neck but no focal neurological deficits. A CT scan of the head is normal. What is the most appropriate next step in management?",
+        "A 70-year-old man with a history of hypertension and hyperlipidemia presents with sudden onset of severe headache, nausea, and vomiting. Examination reveals a stiff neck but no focal neurological deficits. A CT scan of the head is normal.\n\nWhat is the most appropriate next step in management?",
     "answers": {
       'answer1': 'Lumbar puncture',
       'answer2': 'Immediate neurosurgery consultation',
@@ -82,7 +82,7 @@ const questionData = {
   7: {
     "questionNumber": 7,
     "stem":
-        "A 25-year-old woman presents with a three-day history of painful red eyes, photophobia, and blurred vision. Examination reveals bilateral conjunctival injection and corneal haziness. Slit-lamp examination shows cells in the anterior chamber. What is the most likely diagnosis?",
+        "A 25-year-old woman presents with a three-day history of painful red eyes, photophobia, and blurred vision. Examination reveals bilateral conjunctival injection and corneal haziness. Slit-lamp examination shows cells in the anterior chamber.\n\nWhat is the most likely diagnosis?",
     "answers": {
       'answer1': 'Bacterial conjunctivitis',
       'answer2': 'Keratitis',
@@ -95,7 +95,7 @@ const questionData = {
   8: {
     "questionNumber": 8,
     "stem":
-        "A 60-year-old man with a history of smoking presents with hemoptysis, weight loss, and a cough lasting for 3 months. A chest X-ray reveals a mass in the right upper lobe. What is the most appropriate next step?",
+        "A 60-year-old man with a history of smoking presents with hemoptysis, weight loss, and a cough lasting for 3 months. A chest X-ray reveals a mass in the right upper lobe.\n\nWhat is the most appropriate next step?",
     "answers": {
       'answer1': 'Start antituberculosis therapy',
       'answer2': 'Perform a bronchoscopy',
@@ -108,7 +108,7 @@ const questionData = {
   9: {
     "questionNumber": 9,
     "stem":
-        "A 55-year-old man with a long history of type 2 diabetes mellitus presents with decreased sensation in his feet, bilateral foot ulcers, and intermittent claudication. His pulses are diminished in both feet. What is the most likely underlying condition?",
+        "A 55-year-old man with a long history of type 2 diabetes mellitus presents with decreased sensation in his feet, bilateral foot ulcers, and intermittent claudication. His pulses are diminished in both feet.\n\nWhat is the most likely underlying condition?",
     "answers": {
       'answer1': 'Diabetic neuropathy',
       'answer2': 'Peripheral arterial disease',
@@ -121,7 +121,7 @@ const questionData = {
   10: {
     "questionNumber": 10,
     "stem":
-        "A 40-year-old woman with a history of systemic lupus erythematosus presents with fatigue, arthralgia, and a facial rash. Laboratory tests show hematuria and proteinuria. A renal biopsy is performed and shows glomerulonephritis. What is the most appropriate initial treatment?",
+        "A 40-year-old woman with a history of systemic lupus erythematosus presents with fatigue, arthralgia, and a facial rash. Laboratory tests show hematuria and proteinuria. A renal biopsy is performed and shows glomerulonephritis.\n\nWhat is the most appropriate initial treatment?",
     "answers": {
       'answer1': 'High-dose corticosteroids',
       'answer2': 'Non-steroidal anti-inflammatory drugs (NSAIDs)',
