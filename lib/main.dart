@@ -68,36 +68,71 @@ class _QuestionPageState extends State<QuestionPage> {
         padding: const EdgeInsets.symmetric(
           horizontal: 20.0,
         ),
-        child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 0,
-                child: Column(
-                  children: [
-                    Progress(
-                      questionNumber: questionNumber,
-                      questionTotal: questionTotal,
-                    ),
-                    QuestionStem(
-                      stem: stem,
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Container(
-                  child: Answers(
-                    answers: answers,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              flex: 0,
+              child: Column(
+                children: [
+                  Progress(
+                    questionNumber: questionNumber,
+                    questionTotal: questionTotal,
                   ),
+                  QuestionStem(
+                    stem: stem,
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 0,
+              child: Container(
+                child: Answers(
+                  answers: answers,
                 ),
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: ActionButtonsRow(),
+            ),
+          ],
         ),
       ),
+    );
+  }
+}
+
+class ActionButtonsRow extends StatelessWidget {
+  const ActionButtonsRow({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        IconButton.outlined(
+          onPressed: () {
+            print('pressed prev q');
+          },
+          icon: Icon(Icons.arrow_left),
+        ),
+        IconButton.outlined(
+          onPressed: () {
+            print('submit');
+          },
+          icon: Icon(Icons.check),
+        ),
+        IconButton.outlined(
+          onPressed: () {
+            print('pressed next q');
+          },
+          icon: Icon(Icons.arrow_right),
+        ),
+      ],
     );
   }
 }
@@ -158,7 +193,7 @@ class _AnswersState extends State<Answers> {
           color: Colors.white,
         );
         answerBorder = Border.all(
-          color: Colors.black,
+          color: Colors.black26,
           width: 2.0,
         );
       }
@@ -181,7 +216,7 @@ class _AnswersState extends State<Answers> {
           decoration: BoxDecoration(
             border: answerBorder,
             borderRadius: BorderRadius.circular(20.0),
-            color: Colors.black,
+            color: Color.fromARGB(169, 0, 0, 0),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -265,7 +300,9 @@ class Progress extends StatelessWidget {
         ),
         Text(
           '/ $questionTotal',
-          style: TextStyle(),
+          style: TextStyle(
+            color: Colors.grey,
+          ),
         ),
       ],
     );
