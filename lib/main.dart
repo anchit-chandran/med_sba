@@ -64,7 +64,12 @@ class _QuestionPageState extends State<QuestionPage> {
     final correctAnswer = currentQuestionData['correctAnswer'];
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Progress(
+          questionNumber: questionNumber,
+          questionTotal: questionTotal,
+        ),
+      ),
       backgroundColor: colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -79,10 +84,6 @@ class _QuestionPageState extends State<QuestionPage> {
                 children: [
                   Column(
                     children: [
-                      Progress(
-                        questionNumber: questionNumber,
-                        questionTotal: questionTotal,
-                      ),
                       QuestionStem(
                         stem: stem,
                       ),
