@@ -46,7 +46,9 @@ class _QuestionPageState extends State<QuestionPage> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Progress(),
+      ),
       backgroundColor: colorScheme.background,
       body: Padding(
         padding: const EdgeInsets.symmetric(
@@ -61,7 +63,6 @@ class _QuestionPageState extends State<QuestionPage> {
                 children: [
                   Column(
                     children: [
-                      Progress(),
                       QuestionStem(),
                     ],
                   ),
