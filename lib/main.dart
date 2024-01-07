@@ -174,31 +174,29 @@ class _AnswersState extends State<Answers> {
     required bool isCorrect,
     required String widgetType,
   }) {
-    if (widgetType == 'icon') {
-      if (!hasSubmittedAnswer) return Colors.white;
+    Color selectedCorrectColor = isCorrect ? Colors.green : Colors.red;
+    Color nonSelectedCorrectColor = isCorrect ? Colors.green : Colors.red;
 
-      // Has submitted answer
-      if (isCorrect) {
-        return Colors.green;
+    if (widgetType == 'icon' || widgetType == 'text') {
+      if (hasSubmittedAnswer) {
+        if (isSelected) {
+          return selectedCorrectColor; // selected answer after submission
+        } else {
+          return nonSelectedCorrectColor; // unselected answer after submission
+        }
       } else {
-        return Colors.red;
-      }
-    } else if (widgetType == 'text') {
-      if (isSelected) {
-        return Colors.white;
-      } else if (hasSubmittedAnswer) {
-        return isCorrect ? Colors.green : Colors.red;
-      } else {
-        return Colors.white;
+        return Colors.white; // before submission
       }
     } else if (widgetType == 'border') {
-      if (isSelected) {
-        return Colors.white;
-      } else if (hasSubmittedAnswer) {
-        return isCorrect ? Colors.green : Colors.red;
-      } else {
-        return Colors.black;
-      }
+      if (!hasSubmittedAnswer) return Colors.black;
+
+      if (isCorrect) return Colors.green;
+
+      // Non selected, incorrect answer
+      if (!isSelected) return Color.fromARGB(68, 244, 67, 54);
+
+      // Selected, incorrect answer
+      return Colors.red;
     } else {
       throw Exception('Invalid widgetType');
     }
@@ -218,7 +216,7 @@ class _AnswersState extends State<Answers> {
       // Get some state variables
       bool isSelected = answerNum == provider.getCurrentAnswerSelected();
       bool hasSubmittedAnswer = provider.hasSubmittedAnswer();
-      bool isCorrect = provider.wasSubmittedAnswerCorrect();
+      bool isCorrect = answerNum == provider.getCurrentCorrectAnswer();
 
       // Now, set the conditional stylings.
       Icon answerIcon;
