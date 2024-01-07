@@ -26,17 +26,14 @@ class MyApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      home: const QuestionPage(title: 'Flutter Demo Home Page'),
+      home: const QuestionPage(),
     );
   }
 }
 
 class QuestionPage extends StatefulWidget {
-  final String title;
-
   const QuestionPage({
     super.key,
-    required this.title,
   });
 
   @override
@@ -44,24 +41,9 @@ class QuestionPage extends StatefulWidget {
 }
 
 class _QuestionPageState extends State<QuestionPage> {
-  void changeQuestion(context, int newQuestion) {
-    Provider.of<QuestionNotifier>(context, listen: false)
-        .changeQuestion(newQuestion);
-  }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    final questionTotal = Provider.of<QuestionNotifier>(context, listen: false)
-        .getTotalQuestions();
-
-    final currentQuestionData =
-        Provider.of<QuestionNotifier>(context).currentQuestionData;
-    final questionNumber = currentQuestionData['questionNumber'];
-    final stem = currentQuestionData['stem'];
-    final answers = currentQuestionData['answers'];
-    final correctAnswer = currentQuestionData['correctAnswer'];
 
     return Scaffold(
       appBar: AppBar(),
@@ -79,19 +61,11 @@ class _QuestionPageState extends State<QuestionPage> {
                 children: [
                   Column(
                     children: [
-                      Progress(
-                        questionNumber: questionNumber,
-                        questionTotal: questionTotal,
-                      ),
-                      QuestionStem(
-                        stem: stem,
-                      ),
+                      Progress(),
+                      QuestionStem(),
                     ],
                   ),
-                  Answers(
-                    answers: answers,
-                    correctAnswer: correctAnswer,
-                  ),
+                  Answers(),
                 ],
               ),
             ),
@@ -99,7 +73,7 @@ class _QuestionPageState extends State<QuestionPage> {
               padding: const EdgeInsets.only(
                 bottom: 30.0,
               ),
-              child: ActionButtonsRow(correctAnswer: correctAnswer),
+              child: ActionButtonsRow(),
             ),
           ],
         ),
@@ -109,11 +83,8 @@ class _QuestionPageState extends State<QuestionPage> {
 }
 
 class ActionButtonsRow extends StatefulWidget {
-  final int correctAnswer;
-
   const ActionButtonsRow({
     super.key,
-    required this.correctAnswer,
   });
 
   @override
@@ -122,15 +93,16 @@ class ActionButtonsRow extends StatefulWidget {
 
 class _ActionButtonsRowState extends State<ActionButtonsRow> {
   void handleSubmitQuestionPress(context) {
+    var provider = Provider.of<QuestionNotifier>(context, listen: false);
+
     // First get the currently selected answer.
-    var selectedAnswer =
-        Provider.of<QuestionNotifier>(context, listen: false).selectedAnswer;
+    var selectedAnswer = provider.getCurrentAnswerSelected();
 
     // Then notify the provider that the user has submitted an answer.
-    Provider.of<QuestionNotifier>(context, listen: false).setSubmittedAnswer();
+    provider.setSubmittedAnswer();
 
-    if (selectedAnswer == widget.correctAnswer) {
-      Provider.of<QuestionNotifier>(context, listen: false).setIsCorrect();
+    if (selectedAnswer == provider.getCurrentCorrectAnswer()) {
+      print('right!');
     } else {
       print('wrong');
     }
@@ -138,54 +110,46 @@ class _ActionButtonsRowState extends State<ActionButtonsRow> {
 
   @override
   Widget build(BuildContext context) {
-    var provider = Provider.of<QuestionNotifier>(context);
-    var hasSubmittedAnswer = provider.hasSubmittedAnswer;
-    int currentQuestionNum = provider.currentQuestionNum;
+    return Consumer<QuestionNotifier>(
+      builder: (context, provider, child) {
+        bool hasSubmittedAnswer = provider.hasSubmittedAnswer();
+        int currentQuestionNum = provider.currentQuestionNum;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        IconButton.outlined(
-          onPressed: (currentQuestionNum == 1)
-              ? null
-              : () {
-                  Provider.of<QuestionNotifier>(
-                    context,
-                    listen: false,
-                  ).changeQuestion(currentQuestionNum - 1);
-                },
-          icon: Icon(Icons.arrow_left),
-        ),
-        IconButton.outlined(
-          onPressed: hasSubmittedAnswer
-              ? null
-              : () => handleSubmitQuestionPress(context),
-          icon: Icon(Icons.check),
-        ),
-        IconButton.outlined(
-          onPressed: (currentQuestionNum == provider.getTotalQuestions())
-              ? null
-              : () {
-                  Provider.of<QuestionNotifier>(
-                    context,
-                    listen: false,
-                  ).changeQuestion(currentQuestionNum + 1);
-                },
-          icon: Icon(Icons.arrow_right),
-        ),
-      ],
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton.outlined(
+              onPressed: (currentQuestionNum == 1)
+                  ? null
+                  : () {
+                      provider.changeQuestion(currentQuestionNum - 1);
+                    },
+              icon: Icon(Icons.arrow_left),
+            ),
+            IconButton.outlined(
+              onPressed: hasSubmittedAnswer
+                  ? null
+                  : () => handleSubmitQuestionPress(context),
+              icon: Icon(Icons.check),
+            ),
+            IconButton.outlined(
+              onPressed: (currentQuestionNum == provider.getTotalQuestions())
+                  ? null
+                  : () {
+                      provider.changeQuestion(currentQuestionNum + 1);
+                    },
+              icon: Icon(Icons.arrow_right),
+            ),
+          ],
+        );
+      },
     );
   }
 }
 
 class Answers extends StatefulWidget {
-  final Map<String, String> answers;
-  final int correctAnswer;
-
   const Answers({
     super.key,
-    required this.answers,
-    required this.correctAnswer,
   });
 
   @override
@@ -195,7 +159,7 @@ class Answers extends StatefulWidget {
 class _AnswersState extends State<Answers> {
   @override
   Widget build(BuildContext context) {
-    final allAnswerRows = constructAnswerRows(answers: widget.answers);
+    final allAnswerRows = constructAnswerRows(context);
 
     return Column(
       // mainAxisAlignment: MainAxisAlignment.end,
@@ -207,76 +171,53 @@ class _AnswersState extends State<Answers> {
     required bool isSelected,
     required bool hasSubmittedAnswer,
     required bool isCorrect,
-    bool isIconColor = false,
-    bool isTextColor = false,
+    required String widgetType,
   }) {
-    if (isTextColor) {
-      if (hasSubmittedAnswer) {
-        if (isCorrect) {
-          return Colors.green;
-        } else {
-          if (isSelected) {
-            return Colors.red;
-          } else {
-            return Color.fromARGB(139, 255, 60, 79);
-          }
-        }
-      } else {
-        return Colors.white;
-      }
-    }
+    if (widgetType == 'icon') {
+      if (!hasSubmittedAnswer) return Colors.white;
 
-    if (isIconColor) {
-      if (hasSubmittedAnswer) {
-        if (isCorrect) {
-          return Colors.green;
-        } else {
-          if (isSelected) {
-            return Colors.red;
-          } else {
-            return Color.fromARGB(139, 255, 60, 79);
-          }
-        }
+      // Has submitted answer
+      if (isCorrect) {
+        return Colors.green;
+      } else {
+        return Colors.red;
+      }
+    } else if (widgetType == 'text') {
+      if (isSelected) {
+        return Colors.white;
+      } else if (hasSubmittedAnswer) {
+        return isCorrect ? Colors.green : Colors.red;
       } else {
         return Colors.white;
       }
-    } else {
+    } else if (widgetType == 'border') {
       if (isSelected) {
-        if (hasSubmittedAnswer) {
-          if (isCorrect) {
-            return Colors.green;
-          } else {
-            return Colors.red;
-          }
-        } else {
-          return Colors.white;
-        }
+        return Colors.white;
+      } else if (hasSubmittedAnswer) {
+        return isCorrect ? Colors.green : Colors.red;
       } else {
         return Colors.black;
       }
+    } else {
+      throw Exception('Invalid widgetType');
     }
   }
 
-  List<Widget> constructAnswerRows({required Map<String, String> answers}) {
+  List<Widget> constructAnswerRows(context) {
     List<Widget> allAnswers = [];
 
-    var selectedAnswer = Provider.of<QuestionNotifier>(
-      context,
-    ).selectedAnswer;
+    var provider = Provider.of<QuestionNotifier>(context);
+    Map<String, String> currentQuestionAnswers =
+        provider.getCurrentQuestionAnswers();
 
-    bool hasSubmittedAnswer = Provider.of<QuestionNotifier>(
-      context,
-      listen: false,
-    ).hasSubmittedAnswer;
-
-    for (var answer in answers.entries) {
+    for (var answer in currentQuestionAnswers.entries) {
       // First get the answer number from key
       int answerNum = int.parse(answer.key[answer.key.length - 1]);
 
-      // Set true if this is the current selected answer.
-      bool isSelected = answerNum == selectedAnswer;
-
-      bool isCorrect = answerNum == widget.correctAnswer;
+      // Get some state variables
+      bool isSelected = answerNum == provider.getCurrentAnswerSelected();
+      bool hasSubmittedAnswer = provider.hasSubmittedAnswer();
+      bool isCorrect = provider.wasSubmittedAnswerCorrect();
 
       // Now, set the conditional stylings.
       Icon answerIcon;
@@ -284,14 +225,12 @@ class _AnswersState extends State<Answers> {
 
       // Set default styling
       answerIcon = Icon(
-        isSelected || (hasSubmittedAnswer && isCorrect)
-            ? Icons.circle_rounded
-            : Icons.circle_outlined,
+        isSelected ? Icons.circle_rounded : Icons.circle_outlined,
         color: getAnswerColor(
           isSelected: isSelected,
           hasSubmittedAnswer: hasSubmittedAnswer,
           isCorrect: isCorrect,
-          isIconColor: true,
+          widgetType: 'icon',
         ),
       );
 
@@ -299,7 +238,8 @@ class _AnswersState extends State<Answers> {
         color: getAnswerColor(
             isSelected: isSelected,
             hasSubmittedAnswer: hasSubmittedAnswer,
-            isCorrect: isCorrect),
+            isCorrect: isCorrect,
+            widgetType: 'border'),
         width: 2.0,
       );
 
@@ -308,12 +248,7 @@ class _AnswersState extends State<Answers> {
 
       allAnswers.add(GestureDetector(
         onTap: () {
-          hasSubmittedAnswer
-              ? null
-              : Provider.of<QuestionNotifier>(
-                  context,
-                  listen: false,
-                ).changeAnswer(answerNum);
+          hasSubmittedAnswer ? null : provider.changeAnswer(answerNum);
         },
         child: Container(
           margin: EdgeInsets.symmetric(
@@ -344,7 +279,7 @@ class _AnswersState extends State<Answers> {
                         isSelected: isSelected,
                         hasSubmittedAnswer: hasSubmittedAnswer,
                         isCorrect: isCorrect,
-                        isTextColor: true,
+                        widgetType: 'text',
                       ),
                     ),
                   ),
@@ -366,15 +301,15 @@ class _AnswersState extends State<Answers> {
 }
 
 class QuestionStem extends StatelessWidget {
-  final String stem;
-
   const QuestionStem({
     super.key,
-    required this.stem,
   });
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<QuestionNotifier>(context);
+    String stem = provider.getCurrentQuestionStem();
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         vertical: 10.0,
@@ -389,17 +324,16 @@ class QuestionStem extends StatelessWidget {
 }
 
 class Progress extends StatelessWidget {
-  final int questionNumber;
-  final int questionTotal;
-
   const Progress({
     super.key,
-    required this.questionNumber,
-    required this.questionTotal,
   });
 
   @override
   Widget build(BuildContext context) {
+    var provider = Provider.of<QuestionNotifier>;
+    int questionNumber = provider(context).currentQuestionNum;
+    int questionTotal = provider(context).getTotalQuestions();
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.alphabetic,
